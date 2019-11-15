@@ -17,4 +17,13 @@ run: FORCE  # Generate and print markdown file to stdout
 live: FORCE  # Create a live reload server
 	ls src/* | entr -s "pipenv run python -m src.main"
 
+python: FORCE
+	apt-get update -qy
+	apt-get install -y python3-dev python3-pip
+	pip3 install pipenv
+
+python37: FORCE
+	add-apt-repository -y ppa:deadsnakes/ppa
+	apt-get install -y python3.7 python3.7-dev
+
 FORCE: 
