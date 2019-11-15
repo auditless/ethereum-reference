@@ -12,6 +12,8 @@ black = "*"
 yattag = "*"
 sh = "*"
 vyper = "*"
+pysolc = {editable = true,git = "https://github.com/Jonasmpi/py-solc.git"}
+web3 = {extras = ["tester"],version = "*"}
 
 [requires]
 python_version = "3.7"
