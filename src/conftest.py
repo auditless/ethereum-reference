@@ -208,7 +208,7 @@ def compile_single_contract_from_files(
     return _compile_vyper_sources(codes, paths[0])
 
 
-def _compile_vyper_sources(codes: List[str], name: str):
+def _compile_vyper_sources(codes, name: str):
     """Compile a list of Vyper contracts using the first one."""
     output = vyper.compiler.compile_codes(
         codes,

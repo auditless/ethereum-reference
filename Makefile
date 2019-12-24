@@ -1,5 +1,6 @@
 install: FORCE  # Pull in local project dependencies
 	pipenv install
+	pipenv install --dev
 	pipenv lock --pre
 
 test: FORCE  # Run tests

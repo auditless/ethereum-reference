@@ -1,0 +1,58 @@
+version: 2
+jobs:
+  test:
+    docker:
+      - image: circleci/mariadb:10-bionic
+    environment:
+      LC_ALL: C.UTF-8
+      LANG: C.UTF-8
+    
+    working_directory: ~/ethereum-reference
+
+    steps:
+      - checkout
+      - run:
+          name: Install make
+          command: |
+            apt-get -y update
+            apt-get install -y cmake
+      - run:
+          name: Install git
+          command: apt-get install -y git
+      - restore_cache:
+          keys:
+            - venv-cache-v1-{{ .Branch }}
+            - venv-cache-v1
+      - run:
+          name: Install python
+          command: make python
+      - run:
+          name: Install Solidity compiler solc
+          command: |
+            apt-get install wget
+            wget -O /usr/bin/solc-0.5.14 https://github.com/ethereum/solidity/releases/download/v0.5.14/solc-static-linux
+            chmod +x /usr/bin/solc-0.5.14
+            cp /usr/bin/solc-0.5.14 /usr/bin/solc
+      - run:
+          name: Install Python 3.7
+          command: |
+            apt-get install -y software-properties-common
+            make python37
+      - run:
+          name: Install package
+          command: make install
+      - run:
+          name: Run tests
+          command: make test
+      - run:
+          name: Run mypy
+          command: make types
+      - save_cache:
+          key: venv-cache-v1-{{ .Branch }}
+          paths: ~/.local/share/virtualenvs/
+
+workflows:
+  version: 2
+  build_and_test:
+    jobs:
+      - test
