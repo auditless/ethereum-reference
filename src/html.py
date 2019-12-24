@@ -46,5 +46,4 @@ def table_section(name):
             line("th", "Solidity")
             line("th", "Vyper")
 
-
     return render

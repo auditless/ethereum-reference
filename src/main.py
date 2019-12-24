@@ -4,7 +4,14 @@ from yattag import Doc, indent
 import sh
 
 from .html import code, comment, empty, table_section
-from .conftest import check_local_v, check_local_s, check_global_s, check_global_v, check_s, check_v
+from .conftest import (
+    check_local_v,
+    check_local_s,
+    check_global_s,
+    check_global_v,
+    check_s,
+    check_v,
+)
 import solc
 
 
@@ -12,20 +19,20 @@ import solc
 def version_s():
     """
     >>> str(sh.solc("--version"))[50:65]
-    'Version: 0.5.12'
+    'Version: 0.5.14'
     """
     return """$ solc --version
-Version: 0.5.12"""
+Version: 0.5.14"""
 
 
 @code
 def version_v():
     """
     >>> str(sh.vyper("--version"))[:8]
-    '0.1.0b13'
+    '0.1.0b14'
     """
     return """$ vyper --version
-0.1.0b13 (0.1.0 Beta 13)"""
+0.1.0b14 (0.1.0 Beta 14)"""
 
 
 @comment
@@ -155,7 +162,7 @@ def binary_hex_literals_s():
     r"""
     >>> check_local_s(web3, "uint x = 0x52; string memory s = hex\"52\";")
     """
-    return "uint x = 0x52\nstring memory s = hex\"52\""
+    return 'uint x = 0x52\nstring memory s = hex"52"'
 
 
 @code
@@ -166,10 +173,14 @@ def binary_hex_literals_v():
     >>> check_local_v(web3, "c: bytes32= 0x1234567812345678123456781234567812345678123456781234567812345678")
     >>> check_local_v(web3, "b: bytes[1] = 0b00010001")
     """
-    return "a: address= 0x14d465376c051Cbcd80Aa2d35Fd5df9910f80543\n"\
-        + r"b: bytes32= b'\x01\x02\x03\x04\x05\x06... (32 bytes)" + "\n"\
-        + "c: bytes32= 0x010203040506... (32 bytes)" + "\n"\
+    return (
+        "a: address= 0x14d465376c051Cbcd80Aa2d35Fd5df9910f80543\n"
+        + r"b: bytes32= b'\x01\x02\x03\x04\x05\x06... (32 bytes)"
+        + "\n"
+        + "c: bytes32= 0x010203040506... (32 bytes)"
+        + "\n"
         + "d: bytes[1] = 0b00010001"
+    )
 
 
 @code
@@ -301,7 +312,7 @@ def string_comparison_v():
     >>> check_local_v(web3, "assert keccak256(\"abc\") == keccak256(\"abc\")")
     """
     return "keccak256(s1) == keccak256(s2)"
-    
+
 
 @code
 def string_concatenation_s():
@@ -426,6 +437,7 @@ def for_s():
     ...
 }"""
 
+
 @code
 def for_v():
     r"""
@@ -464,14 +476,6 @@ def render() -> str:
     # Final reference doc
     with tag("html"):
         with tag("body"):
-            with tag("h1"):
-                text("Solidity & Vyper Cheat Sheet")
-            with tag("p"):
-                text(
-                    "A feature by feature reference guide to the two most popular programming languages on Ethereum."
-                )
-            with tag("h2"):
-                text("Setup and basic syntax")
             with tag("table"):
                 with tag("tr"):
                     line("th", "Feature")
@@ -527,8 +531,12 @@ def render() -> str:
                     empty(*trip)
                 with tag("tr"):
                     line("th", "Null")
-                    comment(lambda: "null doesn't exist in Solidity but any unitialized variables take a default value represented by 0 in memory")(*trip)
-                    comment(lambda: "null doesn't exist in Vyper but any unitialized variables take a default value represented by 0 in memory")(*trip)
+                    comment(
+                        lambda: "null doesn't exist in Solidity but any unitialized variables take a default value represented by 0 in memory"
+                    )(*trip)
+                    comment(
+                        lambda: "null doesn't exist in Vyper but any unitialized variables take a default value represented by 0 in memory"
+                    )(*trip)
                 with tag("tr"):
                     line("th", "Set variable to default value")
                     empty(*trip)
@@ -665,8 +673,12 @@ def render() -> str:
                     code(lambda: "m[2] = 1")(*trip)
                 with tag("tr"):
                     line("th", "Missing key behaviour")
-                    comment(lambda: "A mapping has no concept of set keys, a mapping always refers to a hashed value that is the same for a given mapping and key")(*trip)
-                    comment(lambda: "A mapping has no concept of set keys, a mapping always refers to a hashed value that is the same for a given mapping and key")(*trip)
+                    comment(
+                        lambda: "A mapping has no concept of set keys, a mapping always refers to a hashed value that is the same for a given mapping and key"
+                    )(*trip)
+                    comment(
+                        lambda: "A mapping has no concept of set keys, a mapping always refers to a hashed value that is the same for a given mapping and key"
+                    )(*trip)
                 with tag("tr"):
                     line("th", "Delete key")
                     code(lambda: "m[2] = 0;")(*trip)
@@ -719,18 +731,20 @@ def render() -> str:
                     empty(*trip)
                 with tag("tr"):
                     line("th", "Exceptions")
-                    code(lambda: "require(false, \"revert reason\")")(*trip)
-                    code(lambda: "raise \"revert reason\"")(*trip)
+                    code(lambda: 'require(false, "revert reason")')(*trip)
+                    code(lambda: 'raise "revert reason"')(*trip)
                 table_section("Misc")(*quad)
                 with tag("tr"):
                     line("th", "Comments")
-                    code(lambda: """NatSpec conventions:
+                    code(
+                        lambda: """NatSpec conventions:
 
 /// @author Mary A. Botanist
 /// @notice Calculate tree age in years, rounded up, for live trees
 /// @dev The Alexandr N. Tetearing algorithm could increase precision
 /// @param rings The number of rings from dendrochronological sample
-/// @return age in years, rounded up for partial years""")(*trip)
+/// @return age in years, rounded up for partial years"""
+                    )(*trip)
                     empty(*trip)
                 with tag("tr"):
                     line("th", "Payment with error on failure")
@@ -743,22 +757,29 @@ def render() -> str:
                 with tag("tr"):
                     line("th", "Payment with gas forwarding (WARNING)")
                     code(lambda: "address.call.value().gas()()")(*trip)
-                    code(lambda: "raw_call(address, data, outsize, gas, value, is_delegate_call)")(*trip)
+                    code(
+                        lambda: "raw_call(address, data, outsize, gas, value, is_delegate_call)"
+                    )(*trip)
                 with tag("tr"):
                     line("th", "Event logging")
-                    code(lambda: """event Deposit(
+                    code(
+                        lambda: """event Deposit(
     address indexed _from,
     bytes32 indexed _id,
     uint _value
 );
 
-emit Deposit(msg.sender, _id, msg.value);""")(*trip)
-                    code(lambda: """Deposit: event({_from: indexed(address), _id: indexed(bytes32), _value: uint256})
+emit Deposit(msg.sender, _id, msg.value);"""
+                    )(*trip)
+                    code(
+                        lambda: """Deposit: event({_from: indexed(address), _id: indexed(bytes32), _value: uint256})
 
-log.Deposit(msg.sender, _id, msg.value)""")(*trip)
+log.Deposit(msg.sender, _id, msg.value)"""
+                    )(*trip)
                 with tag("tr"):
                     line("th", "Units and global constants")
-                    code(lambda: """1 ether
+                    code(
+                        lambda: """1 ether
 1 finney
 1 szabo
 1 wei
@@ -767,8 +788,10 @@ log.Deposit(msg.sender, _id, msg.value)""")(*trip)
 1 hours
 1 days
 1 weeks
-1 years  // deprecated)""")(*trip)
-                    code(lambda: """ZERO_ADDRESS
+1 years  // deprecated)"""
+                    )(*trip)
+                    code(
+                        lambda: """ZERO_ADDRESS
 as_wei_value(1, "finney")
 as_wei_value(1, "szabo")
 as_wei_value(1, "wei")
@@ -791,10 +814,12 @@ units: {
     km: "kilometer"
 }
 a: int128(cm)
-b: uint256(km)""")(*trip)
+b: uint256(km)"""
+                    )(*trip)
                 with tag("tr"):
                     line("th", "Block and transaction properties")
-                    code(lambda: """blockhash(blockNumber)
+                    code(
+                        lambda: """blockhash(blockNumber)
 block.coinbase
 block.difficulty
 block.gaslimit
@@ -809,8 +834,10 @@ msg.sender
 msg.sig
 msg.value
 tx.gasprice
-tx.origin""")(*trip)
-                    code(lambda: """blockhash(blockNumber)
+tx.origin"""
+                    )(*trip)
+                    code(
+                        lambda: """blockhash(blockNumber)
 block.coinbase
 block.difficulty
 
@@ -825,8 +852,8 @@ msg.sender
 
 msg.value
 
-tx.origin""")(*trip)
-
+tx.origin"""
+                    )(*trip)
 
     # Prettify the HTML
     unindented = doc.getvalue()
