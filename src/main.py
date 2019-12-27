@@ -102,6 +102,22 @@ def compound_assignment_s():
 
 
 @code
+def increment_decrement_s():
+    r"""
+    >>> check_local_s(web3, "uint i = 0; i++; ++i; i--; --i;")
+    """
+    return "i++, ++i, i--, --i"
+
+
+@code
+def increment_decrement_v():
+    r"""
+    >>> check_local_v(web3, "v: uint256= 0\nv += 1\nv -= 1")
+    """
+    return "i += 1, i -= 1"
+
+
+@code
 def set_default_v():
     r"""
     >>> check_local_v(web3, "v: uint256= 1\nclear(v)")
@@ -527,8 +543,8 @@ def render() -> str:
                     code(lambda: "-=, *=, /=, %=, |=, &=, ^=")(*trip)
                 with tag("tr"):
                     line("th", "Increment and decrement")
-                    par_assignment_s(*trip)
-                    empty(*trip)
+                    increment_decrement_s(*trip)
+                    increment_decrement_v(*trip)
                 with tag("tr"):
                     line("th", "Null")
                     comment(
@@ -630,7 +646,7 @@ def render() -> str:
                 with tag("tr"):
                     line("th", "Length")
                     code(lambda: "a.length")(*trip)
-                    empty(*trip)
+                    code(lambda: "len(a)")(*trip)
                 with tag("tr"):
                     line("th", "Empty test")
                     code(lambda: "a.length == 0")(*trip)
@@ -745,7 +761,16 @@ def render() -> str:
 /// @param rings The number of rings from dendrochronological sample
 /// @return age in years, rounded up for partial years"""
                     )(*trip)
-                    empty(*trip)
+                    code(
+                        lambda: """def foo():
+    \"\"\"
+    @author Mary A. Botanist
+    @notice Calculate tree age in years, rounded up, for live trees
+    @dev The Alexandr N. Tetearing algorithm could increase precision
+    @param rings The number of rings from dendrochronological sample
+    @return age in years, rounded up for partial years
+    \"\"\"
+    ...""")(*trip)
                 with tag("tr"):
                     line("th", "Payment with error on failure")
                     code(lambda: "address.transfer()")(*trip)
