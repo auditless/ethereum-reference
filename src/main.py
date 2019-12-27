@@ -122,7 +122,7 @@ def set_default_v():
     r"""
     >>> check_local_v(web3, "v: uint256= 1\nclear(v)")
     """
-    return "clear(v)"
+    return "clear(v) // doesn't work with mappings"
 
 
 @code
