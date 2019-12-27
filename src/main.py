@@ -118,11 +118,19 @@ def increment_decrement_v():
 
 
 @code
+def set_default_s():
+    r"""
+    >>> check_local_s(web3, "uint v = 1; delete v;")
+    """
+    return "delete v // doesn't work with mappings"
+
+
+@code
 def set_default_v():
     r"""
     >>> check_local_v(web3, "v: uint256= 1\nclear(v)")
     """
-    return "clear(v) // doesn't work with mappings"
+    return "clear(v) # doesn't work with mappings"
 
 
 @code
@@ -555,7 +563,7 @@ def render() -> str:
                     )(*trip)
                 with tag("tr"):
                     line("th", "Set variable to default value")
-                    empty(*trip)
+                    set_default_s(*trip)
                     set_default_v(*trip)
                 with tag("tr"):
                     line("th", "Null test")

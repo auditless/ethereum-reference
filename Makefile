@@ -15,6 +15,9 @@ types: FORCE  # Type check
 run: FORCE  # Generate and print markdown file to stdout
 	pipenv run python -m src.main
 
+push: FORCE # Prepare gen.html file for publishing
+	pipenv run python -m src.main > ../ethereum-reference-www/src/generated/gen.html
+
 live: FORCE  # Create a live reload server
 	ls src/* | entr -s "pipenv run python -m src.main"
 
