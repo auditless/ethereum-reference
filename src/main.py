@@ -341,6 +341,7 @@ def string_comparison_v():
 @code
 def string_concatenation_s():
     r"""
+    Read more here: https://solidity.readthedocs.io/en/v0.5.3/frequently-asked-questions.html?highlight=encodepacked#can-i-concatenate-two-strings
     >>> check_local_s(web3, "require(keccak256(abi.encodePacked(\"ab\", \"c\")) == keccak256(abi.encodePacked(\"abc\")));")
     """
     return "abi.encodePacked(s1, s2)"
@@ -778,7 +779,8 @@ def render() -> str:
     @param rings The number of rings from dendrochronological sample
     @return age in years, rounded up for partial years
     \"\"\"
-    ...""")(*trip)
+    ..."""
+                    )(*trip)
                 with tag("tr"):
                     line("th", "Payment with error on failure")
                     code(lambda: "address.transfer()")(*trip)
