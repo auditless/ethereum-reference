@@ -1,3 +1,4 @@
+pipenv run python -m src.main
 <html>
   <body>
     <table>
@@ -10,11 +11,11 @@
         <th>Version</th>
         <td>
           <pre>$ solc --version
-Version: 0.5.14</pre>
+Version: 0.6.0</pre>
         </td>
         <td>
           <pre>$ vyper --version
-0.1.0b14 (0.1.0 Beta 14)</pre>
+0.1.0b16 (0.1.0 Beta 16)</pre>
         </td>
       </tr>
       <tr>
@@ -112,10 +113,10 @@ comment */</pre>
       <tr>
         <th>Increment and decrement</th>
         <td>
-          <pre>(x, y) = (0, 1);</pre>
+          <pre>i++, ++i, i--, --i</pre>
         </td>
         <td>
-          <p></p>
+          <pre>i += 1, i -= 1</pre>
         </td>
       </tr>
       <tr>
@@ -130,10 +131,10 @@ comment */</pre>
       <tr>
         <th>Set variable to default value</th>
         <td>
-          <p></p>
+          <pre>delete v // doesn't work with mappings</pre>
         </td>
         <td>
-          <pre>clear(v)</pre>
+          <pre>clear(v) # doesn't work with mappings</pre>
         </td>
       </tr>
       <tr>
@@ -342,7 +343,8 @@ bytes[N]  # N is a fixed number</pre>
       <tr>
         <th>Slice</th>
         <td>
-          <p></p>
+          <pre>abi.decode(_payload[:4], (bytes4))
+// array slices only implemented for calldata arrays</pre>
         </td>
         <td>
           <pre>slice(x, start=_start, len=_len)</pre>
@@ -381,7 +383,7 @@ bytes[N]  # N is a fixed number</pre>
           <pre>a.length</pre>
         </td>
         <td>
-          <p></p>
+          <pre>len(a)</pre>
         </td>
       </tr>
       <tr>
@@ -641,12 +643,47 @@ else:
         </td>
       </tr>
       <tr>
-        <th>Exceptions</th>
+        <th>Revert</th>
         <td>
           <pre>require(false, "revert reason")</pre>
         </td>
         <td>
           <pre>raise "revert reason"</pre>
+        </td>
+      </tr>
+      <tr>
+        <th>Exception handling</th>
+        <td>
+          <pre>
+interface DataFeed { function getData(address token) external returns (uint value); }
+
+contract FeedConsumer {
+    DataFeed feed;
+    uint errorCount;
+    function rate(address token) public returns (uint value, bool success) {
+        // Permanently disable the mechanism if there are
+        // more than 10 errors.
+        require(errorCount &lt; 10);
+        try feed.getData(token) returns (uint v) {
+            return (v, true);
+        } catch Error(string memory /*reason*/) {
+            // This is executed in case
+            // revert was called inside getData
+            // and a reason string was provided.
+            errorCount++;
+            return (0, false);
+        } catch (bytes memory /*lowLevelData*/) {
+            // This is executed in case revert() was used
+            // or there was a failing assertion, division
+            // by zero, etc. inside getData.
+            errorCount++;
+            return (0, false);
+        }
+    }
+}</pre>
+        </td>
+        <td>
+          <p></p>
         </td>
       </tr>
       <tr>
@@ -669,7 +706,15 @@ else:
 /// @return age in years, rounded up for partial years</pre>
         </td>
         <td>
-          <p></p>
+          <pre>def foo():
+    """
+    @author Mary A. Botanist
+    @notice Calculate tree age in years, rounded up, for live trees
+    @dev The Alexandr N. Tetearing algorithm could increase precision
+    @param rings The number of rings from dendrochronological sample
+    @return age in years, rounded up for partial years
+    """
+    ...</pre>
         </td>
       </tr>
       <tr>

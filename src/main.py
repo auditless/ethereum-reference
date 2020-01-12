@@ -11,6 +11,8 @@ from .conftest import (
     check_global_v,
     check_s,
     check_v,
+    check_contract_s,
+    check_named_contract_s,
 )
 import solc
 
@@ -18,21 +20,21 @@ import solc
 @code
 def version_s():
     """
-    >>> str(sh.solc("--version"))[50:65]
-    'Version: 0.5.14'
+    >>> str(sh.solc("--version"))[50:64]
+    'Version: 0.6.0'
     """
     return """$ solc --version
-Version: 0.5.14"""
+Version: 0.6.0"""
 
 
 @code
 def version_v():
     """
     >>> str(sh.vyper("--version"))[:8]
-    '0.1.0b14'
+    '0.1.0b16'
     """
     return """$ vyper --version
-0.1.0b14 (0.1.0 Beta 14)"""
+0.1.0b16 (0.1.0 Beta 16)"""
 
 
 @comment
@@ -315,6 +317,19 @@ def string_literal_escapes_v():
 
 
 @code
+def slice_s():
+    r"""
+    >>> check_contract_s(web3, '''
+    ... contract Proxy {
+    ...     function decode(bytes calldata _payload) external {
+    ...         bytes4 sig = abi.decode(_payload[:4], (bytes4));
+    ...     }
+    ... }''')
+    """
+    return "abi.decode(_payload[:4], (bytes4))\n// array slices only implemented for calldata arrays"
+
+
+@code
 def slice_v():
     r"""
     >>> check_local_v(web3, "b: bytes[100] = b\"\x01\x02\x03\"\nassert len(slice(b, start=0, len=2)) == 2")
@@ -492,6 +507,57 @@ def do_while_s():
 } while (a > 0);"""
 
 
+@code
+def exceptions_s():
+    r"""
+    >>> check_named_contract_s(web3, '''
+    ...     interface DataFeed { function getData(address token) external returns (uint value); }
+    ...     contract FeedConsumer {
+    ...         DataFeed feed;
+    ...         uint errorCount;
+    ...         function rate(address token) public returns (uint value, bool success) {
+    ...             require(errorCount < 10);
+    ...             try feed.getData(token) returns (uint v) {
+    ...                 return (v, true);
+    ...             } catch Error(string memory) {
+    ...                 errorCount++;
+    ...                 return (0, false);
+    ...             } catch (bytes memory) {
+    ...                 errorCount++;
+    ...                 return (0, false);
+    ...             }
+    ...         }
+    ...     }\n''', "FeedConsumer")
+    """
+    return """
+interface DataFeed { function getData(address token) external returns (uint value); }
+
+contract FeedConsumer {
+    DataFeed feed;
+    uint errorCount;
+    function rate(address token) public returns (uint value, bool success) {
+        // Permanently disable the mechanism if there are
+        // more than 10 errors.
+        require(errorCount < 10);
+        try feed.getData(token) returns (uint v) {
+            return (v, true);
+        } catch Error(string memory /*reason*/) {
+            // This is executed in case
+            // revert was called inside getData
+            // and a reason string was provided.
+            errorCount++;
+            return (0, false);
+        } catch (bytes memory /*lowLevelData*/) {
+            // This is executed in case revert() was used
+            // or there was a failing assertion, division
+            // by zero, etc. inside getData.
+            errorCount++;
+            return (0, false);
+        }
+    }
+}"""
+
+
 def render() -> str:
     """Render the final page."""
     doc, tag, text, line = Doc().ttl()
@@ -638,7 +704,7 @@ def render() -> str:
                     comment(lambda: "Yes")(*trip)
                 with tag("tr"):
                     line("th", "Slice")
-                    empty(*trip)
+                    slice_s(*trip)
                     slice_v(*trip)
                 with tag("tr"):
                     line("th", "String comparison")
@@ -755,9 +821,13 @@ def render() -> str:
                     code(lambda: "require(x > y);")(*trip)
                     empty(*trip)
                 with tag("tr"):
-                    line("th", "Exceptions")
+                    line("th", "Revert")
                     code(lambda: 'require(false, "revert reason")')(*trip)
                     code(lambda: 'raise "revert reason"')(*trip)
+                with tag("tr"):
+                    line("th", "Exception handling")
+                    exceptions_s(*trip)
+                    empty(*trip)
                 table_section("Misc")(*quad)
                 with tag("tr"):
                     line("th", "Comments")

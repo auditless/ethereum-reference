@@ -14,6 +14,28 @@ def web3(doctest_namespace):
     doctest_namespace["web3"] = Web3(EthereumTesterProvider())
 
 
+def check_contract_s(web3: Web3, contract_code: str):
+    """Verify if a given contract compiles in solidity"""
+    # Compile the code
+    compiled = compile_single_contract(contract_code)
+
+    # Deploy
+    _test_compiled_snippet(web3, compiled)
+
+    # At this point if there hasn't been an exception, the run is a success
+
+
+def check_named_contract_s(web3: Web3, contract_code: str, name: str):
+    """Verify if the given named contract compiles in solidity"""
+    # Compile the code
+    compiled = compile_named_contract(contract_code, name)
+
+    # Deploy
+    _test_compiled_snippet(web3, compiled)
+
+    # At this point if there hasn't been an exception, the run is a success
+
+
 def check_local_s(web3: Web3, snippet: str):
     """Verify if piece of code compiles if placed in a
     constructor function of an empty contract of solidity code"""
@@ -28,13 +50,7 @@ def check_local_s(web3: Web3, snippet: str):
 }}
 """
 
-    # Compile the code
-    compiled = compile_single_contract(code)
-
-    # Deploy
-    _test_compiled_snippet(web3, compiled)
-
-    # At this point if there hasn't been an exception, the run is a success
+    check_contract_s(web3, code)
 
 
 def check_local_v(web3: Web3, snippet: str):
@@ -71,13 +87,7 @@ def check_global_s(web3: Web3, snippet: str):
 }}
 """
 
-    # Compile the code
-    compiled = compile_single_contract(code)
-
-    # Deploy
-    _test_compiled_snippet(web3, compiled)
-
-    # At this point if there hasn't been an exception, the run is a success
+    check_contract_s(web3, code)
 
 
 def check_global_v(web3: Web3, snippet: str):
@@ -117,13 +127,7 @@ def check_s(web3: Web3, global_snippet: str, local_snippet: str):
 }}
 """
 
-    # Compile the code
-    compiled = compile_single_contract(code)
-
-    # Deploy
-    _test_compiled_snippet(web3, compiled)
-
-    # At this point if there hasn't been an exception, the run is a success
+    check_contract_s(web3, code)
 
 
 def check_v(web3: Web3, global_snippet: str, local_snippet: str):
@@ -167,6 +171,17 @@ def compile_single_contract(source: str, **compiler_kwargs):
         raise Exception("Can only handle single contracts.")
     compiled = compiled_all[next(iter(compiled_all))]
     return compiled
+
+
+def compile_named_contract(source: str, name: str, **compiler_kwargs):
+    """Compile named contract in Solidity source code."""
+    # pylint: disable=fixme
+    # TODO: Add vyper support
+    compiled_all = compile_source(source, **compiler_kwargs)
+    for key in compiled_all:
+        if name in key:
+            return compiled_all[key]
+    raise Exception("Named contract not found in compiled artifacts.")
 
 
 def compile_specific_contract(source: str, contract_name: str, **compiler_kwargs):

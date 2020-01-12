@@ -7,13 +7,14 @@ verify_ssl = true
 pytest = "*"
 mypy = "*"
 black = "*"
+pylint = "*"
 
 [packages]
 yattag = "*"
 sh = "*"
-vyper = "*"
 pysolc = {editable = true,git = "https://github.com/Jonasmpi/py-solc.git"}
 web3 = {extras = ["tester"],version = "*"}
+vyper = "*"
 
 [requires]
 python_version = "3.7"
