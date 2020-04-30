@@ -410,7 +410,7 @@ def struct_v():
     y: uint256  # Creating a struct
 
 pair: Pair = Pair({x: 2, y: 3})  # Instantiating a struct variable
-assert pair.y > pair.x)  # Accessing elements"""
+assert pair.y > pair.x  # Accessing elements"""
 
 
 @code
@@ -852,11 +852,11 @@ def render() -> str:
     ..."""
                     )(*trip)
                 with tag("tr"):
-                    line("th", "Payment with error on failure")
+                    line("th", "Payment with error on failure (Avoid for Solidity)")
                     code(lambda: "address.transfer()")(*trip)
                     code(lambda: "send(address, value)")(*trip)
                 with tag("tr"):
-                    line("th", "Payment with false on failure")
+                    line("th", "Payment with false on failure (Avoid for Solidity)")
                     code(lambda: "address.send()")(*trip)
                     empty(*trip)
                 with tag("tr"):
@@ -959,6 +959,11 @@ msg.value
 
 tx.origin"""
                     )(*trip)
+                with tag("tr"):
+                    line("th", "Selfdestruct (Avoid)")
+                    code(lambda: "selfdestruct(refundAddr)")(*trip)
+                    code(lambda: "selfdestruct(refund_addr)")(*trip)
+
 
     # Prettify the HTML
     unindented = doc.getvalue()
