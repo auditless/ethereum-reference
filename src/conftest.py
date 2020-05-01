@@ -90,6 +90,22 @@ def check_global_s(web3: Web3, snippet: str):
     check_contract_s(web3, code)
 
 
+def check_global_constructor_s(web3: Web3, global_snippet: str, constructor_snippet: str):
+    """Verify if piece of code compiles if placed in an
+    empty solidity contract body"""
+
+    # Build the code using a template
+    code = f"""contract DeployOnly {{
+    {global_snippet}
+    constructor() public {{
+        {constructor_snippet}
+    }}
+}}
+"""
+
+    check_contract_s(web3, code)
+
+
 def check_global_v(web3: Web3, snippet: str):
     """Verify if piece of code compiles if placed in an
     empty vyper contract body"""

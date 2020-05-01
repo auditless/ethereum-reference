@@ -13,6 +13,7 @@ from .conftest import (
     check_v,
     check_contract_s,
     check_named_contract_s,
+    check_global_constructor_s,
 )
 import solc
 
@@ -21,20 +22,20 @@ import solc
 def version_s():
     """
     >>> str(sh.solc("--version"))[50:64]
-    'Version: 0.6.0'
+    'Version: 0.6.6'
     """
     return """$ solc --version
-Version: 0.6.0"""
+Version: 0.6.6"""
 
 
 @code
 def version_v():
     """
     >>> str(sh.vyper("--version"))[:8]
-    '0.1.0b16'
+    '0.1.0b17'
     """
     return """$ vyper --version
-0.1.0b16 (0.1.0 Beta 16)"""
+0.1.0b17 (0.1.0 Beta 17)"""
 
 
 @comment
@@ -332,9 +333,9 @@ def slice_s():
 @code
 def slice_v():
     r"""
-    >>> check_local_v(web3, "b: bytes[100] = b\"\x01\x02\x03\"\nassert len(slice(b, start=0, len=2)) == 2")
+    >>> check_local_v(web3, "b: bytes[100] = b\"\x01\x02\x03\"\nassert len(slice(b, 0, 2)) == 2")
     """
-    return "slice(x, start=_start, len=_len)"
+    return "slice(x, _start, _len)"
 
 
 @code
@@ -419,6 +420,14 @@ def mapping_delete_v():
     >>> check_v(web3, "m: map(uint256, uint256)", "self.m[2] = 2\nclear(self.m[2])")
     """
     return "clear(m[2])"
+
+
+@code
+def immutable_s():
+    r"""
+    >>> check_global_constructor_s(web3, "uint immutable x;", "x = 1;")
+    """
+    return """uint immutable x; // have to be assigned in the constructor"""
 
 
 @code
@@ -640,6 +649,33 @@ def render() -> str:
                     line("th", "Conditional expression")
                     conditional_expression_s(*trip)
                     comment(lambda: "Conditional expression not supported")(*trip)
+
+                table_section("Contract lifecycle")(*quad)
+                with tag("tr"):
+                    line("th", "Contract creation")
+                    code(lambda: "Contract c = new Contract(args);")(*trip)
+                    empty(*trip)
+                with tag("tr"):
+                    line("th", "Contract creation with funding")
+                    code(lambda: "Contract c = new Contract{value: amount}(args);")(
+                        *trip
+                    )
+                    empty(*trip)
+                with tag("tr"):
+                    line("th", "Salted contract creation (CREATE2)")
+                    code(lambda: "Contract c = new Contract{salt: salt}(args);")(*trip)
+                    empty(*trip)
+                with tag("tr"):
+                    line("th", "Create forwarder contract")
+                    empty(*trip)
+                    code(
+                        lambda: "contract: address = create_forwarder_to(other_contract, value)"
+                    )(*trip)
+                with tag("tr"):
+                    line("th", "Selfdestruct (Avoid)")
+                    code(lambda: "selfdestruct(refundAddr)")(*trip)
+                    code(lambda: "selfdestruct(refund_addr)")(*trip)
+
                 table_section("Operators")(*quad)
                 with tag("tr"):
                     line("th", "True and false")
@@ -774,6 +810,10 @@ def render() -> str:
                     line("th", "Delete key")
                     code(lambda: "m[2] = 0;")(*trip)
                     mapping_delete_v(*trip)
+                with tag("tr"):
+                    line("th", "Immutable variables")
+                    immutable_s(*trip)
+                    empty(*trip)
                 table_section("Functions")(*quad)
                 with tag("tr"):
                     line("th", "Define function")
@@ -783,6 +823,12 @@ def render() -> str:
                     line("th", "Invoke function")
                     code(lambda: "add2(x, y)")(*trip)
                     code(lambda: "add2(x, y)")(*trip)
+                with tag("tr"):
+                    line("th", "External function calls")
+                    code(lambda: "c.f{gas: 1000, value: 4 ether}()")(*trip)
+                    code(
+                        lambda: "c.f()\nraw_call(address, data, outsize, gas, value, is_delegate_call)"
+                    )(*trip)
                 table_section("Control flow")(*quad)
                 with tag("tr"):
                     line("th", "If statement")
@@ -959,11 +1005,6 @@ msg.value
 
 tx.origin"""
                     )(*trip)
-                with tag("tr"):
-                    line("th", "Selfdestruct (Avoid)")
-                    code(lambda: "selfdestruct(refundAddr)")(*trip)
-                    code(lambda: "selfdestruct(refund_addr)")(*trip)
-
 
     # Prettify the HTML
     unindented = doc.getvalue()
