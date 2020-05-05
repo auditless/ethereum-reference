@@ -14,6 +14,8 @@ from .conftest import (
     check_contract_s,
     check_named_contract_s,
     check_global_constructor_s,
+    check_compiles_s,
+    check_compiles_v,
 )
 import solc
 
@@ -22,10 +24,10 @@ import solc
 def version_s():
     """
     >>> str(sh.solc("--version"))[50:64]
-    'Version: 0.6.6'
+    'Version: 0.6.7'
     """
     return """$ solc --version
-Version: 0.6.6"""
+Version: 0.6.7"""
 
 
 @code
@@ -174,6 +176,43 @@ def conditional_expression_s():
     >>> check_local_s(web3, "uint x; uint v = x > 0 ? x : -x;")
     """
     return "x > 0 ? x : -x"
+
+
+@code
+def interface_s():
+    r"""
+    >>> check_compiles_s(web3, "interface HelloWorld { function hello() external pure; }\ncontract Test {}")
+    """
+    return """interface HelloWorld {
+    function hello() external pure;
+    function world(int) external pure;
+}"""
+
+
+@code
+def interface_v():
+    r"""
+    >>> check_compiles_v(web3, "contract HelloWorld:\n  def hello(): modifying\n\n@public\ndef test(addr: address):\n  HelloWorld(addr).hello()")
+    """
+    return """contract HelloWorld:
+    def hello(): modifying
+    def world(uint256): modifyingo"""
+
+
+@code
+def interface_type_s():
+    r"""
+    >>> check_compiles_s(web3, "interface HelloWorld { function hello() external pure; }\ncontract Test { bytes4 public hello_world = type(HelloWorld).interfaceId;}")
+    """
+    return """interface HelloWorldWithEvent {
+    event Event();
+    function hello() external pure;
+    function world(int) external pure;
+}
+
+contract Test {
+    bytes4 public hello_world_with_event = type(HelloWorldWithEvent).interfaceId;
+}"""
 
 
 @code
@@ -675,6 +714,16 @@ def render() -> str:
                     line("th", "Selfdestruct (Avoid)")
                     code(lambda: "selfdestruct(refundAddr)")(*trip)
                     code(lambda: "selfdestruct(refund_addr)")(*trip)
+
+                table_section("Interfaces")(*quad)
+                with tag("tr"):
+                    line("th", "Interfaces")
+                    interface_s(*trip)
+                    interface_v(*trip)
+                with tag("tr"):
+                    line("th", "Interface type")
+                    interface_type_s(*trip)
+                    empty(*trip)
 
                 table_section("Operators")(*quad)
                 with tag("tr"):

@@ -14,6 +14,27 @@ def web3(doctest_namespace):
     doctest_namespace["web3"] = Web3(EthereumTesterProvider())
 
 
+def check_compiles_s(web3: Web3, contract_code: str):
+    """Check if a Solidity file compiles without running a contract."""
+    _ = compile_contracts_s(contract_code)
+
+
+def check_compiles_v(web3: Web3, contract_code: str):
+    """Check if a Vyper file compiles without running a contract."""
+    _ = compile_contracts_v(contract_code)
+
+
+def check_contract_v(web3: Web3, contract_code: str):
+    """Verify if a given contract compiles in vyper"""
+    # Compile the code
+    compiled = compile_specific_vyper_contract(contract_code)
+
+    # Deploy
+    _test_compiled_snippet(web3, compiled)
+
+    # At this point if there hasn't been an exception, the run is a success
+
+
 def check_contract_s(web3: Web3, contract_code: str):
     """Verify if a given contract compiles in solidity"""
     # Compile the code
@@ -176,6 +197,16 @@ def _test_compiled_snippet(web3, compiled):
     contract = web3.eth.contract(abi=abi, bytecode=bytecode)
     tx_hash = contract.constructor().transact()
     tx_receipt = web3.eth.waitForTransactionReceipt(tx_hash)
+
+
+def compile_contracts_s(source: str, **compiler_kwargs):
+    """Compile Solidity source code."""
+    return compile_source(source, **compiler_kwargs)
+
+
+def compile_contracts_v(source: str, **compiler_kwargs):
+    """Compile Vyper source code."""
+    return compile_specific_vyper_contract(source)
 
 
 def compile_single_contract(source: str, **compiler_kwargs):
