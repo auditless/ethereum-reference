@@ -11,11 +11,11 @@ pipenv run python -m src.main
         <th>Version</th>
         <td>
           <pre>$ solc --version
-Version: 0.6.0</pre>
+Version: 0.6.8</pre>
         </td>
         <td>
           <pre>$ vyper --version
-0.1.0b16 (0.1.0 Beta 16)</pre>
+0.1.0b17 (0.1.0 Beta 17)</pre>
         </td>
       </tr>
       <tr>
@@ -153,6 +153,98 @@ comment */</pre>
         </td>
         <td>
           <p>Conditional expression not supported</p>
+        </td>
+      </tr>
+      <tr>
+        <th colspan="3">Contract lifecycle</th>
+      </tr>
+      <tr>
+        <th>Feature</th>
+        <th>Solidity</th>
+        <th>Vyper</th>
+      </tr>
+      <tr>
+        <th>Contract creation</th>
+        <td>
+          <pre>Contract c = new Contract(args);</pre>
+        </td>
+        <td>
+          <p></p>
+        </td>
+      </tr>
+      <tr>
+        <th>Contract creation with funding</th>
+        <td>
+          <pre>Contract c = new Contract{value: amount}(args);</pre>
+        </td>
+        <td>
+          <p></p>
+        </td>
+      </tr>
+      <tr>
+        <th>Salted contract creation (CREATE2)</th>
+        <td>
+          <pre>Contract c = new Contract{salt: salt}(args);</pre>
+        </td>
+        <td>
+          <p></p>
+        </td>
+      </tr>
+      <tr>
+        <th>Create forwarder contract</th>
+        <td>
+          <p></p>
+        </td>
+        <td>
+          <pre>contract: address = create_forwarder_to(other_contract, value)</pre>
+        </td>
+      </tr>
+      <tr>
+        <th>Selfdestruct (Avoid)</th>
+        <td>
+          <pre>selfdestruct(refundAddr)</pre>
+        </td>
+        <td>
+          <pre>selfdestruct(refund_addr)</pre>
+        </td>
+      </tr>
+      <tr>
+        <th colspan="3">Interfaces</th>
+      </tr>
+      <tr>
+        <th>Feature</th>
+        <th>Solidity</th>
+        <th>Vyper</th>
+      </tr>
+      <tr>
+        <th>Interfaces</th>
+        <td>
+          <pre>interface HelloWorld {
+    function hello() external pure;
+    function world(int) external pure;
+}</pre>
+        </td>
+        <td>
+          <pre>contract HelloWorld:
+    def hello(): modifying
+    def world(uint256): modifyingo</pre>
+        </td>
+      </tr>
+      <tr>
+        <th>Interface type</th>
+        <td>
+          <pre>interface HelloWorldWithEvent {
+    event Event();
+    function hello() external pure;
+    function world(int) external pure;
+}
+
+contract Test {
+    bytes4 public hello_world_with_event = type(HelloWorldWithEvent).interfaceId;
+}</pre>
+        </td>
+        <td>
+          <p></p>
         </td>
       </tr>
       <tr>
@@ -347,7 +439,7 @@ bytes[N]  # N is a fixed number</pre>
 // array slices only implemented for calldata arrays</pre>
         </td>
         <td>
-          <pre>slice(x, start=_start, len=_len)</pre>
+          <pre>slice(x, _start, _len)</pre>
         </td>
       </tr>
       <tr>
@@ -457,7 +549,7 @@ require(pair.y &gt; pair.x);  // Accessing elements</pre>
     y: uint256  # Creating a struct
 
 pair: Pair = Pair({x: 2, y: 3})  # Instantiating a struct variable
-assert pair.y &gt; pair.x)  # Accessing elements</pre>
+assert pair.y &gt; pair.x  # Accessing elements</pre>
         </td>
       </tr>
       <tr>
@@ -506,6 +598,15 @@ assert pair.y &gt; pair.x)  # Accessing elements</pre>
         </td>
       </tr>
       <tr>
+        <th>Immutable variables</th>
+        <td>
+          <pre>uint immutable x; // have to be assigned in the constructor</pre>
+        </td>
+        <td>
+          <p></p>
+        </td>
+      </tr>
+      <tr>
         <th colspan="3">Functions</th>
       </tr>
       <tr>
@@ -533,6 +634,16 @@ def add2(x: uint256, y: uint256) -&gt; uint256:
         </td>
         <td>
           <pre>add2(x, y)</pre>
+        </td>
+      </tr>
+      <tr>
+        <th>External function calls</th>
+        <td>
+          <pre>c.f{gas: 1000, value: 4 ether}()</pre>
+        </td>
+        <td>
+          <pre>c.f()
+raw_call(address, data, outsize, gas, value, is_delegate_call)</pre>
         </td>
       </tr>
       <tr>
@@ -718,7 +829,7 @@ contract FeedConsumer {
         </td>
       </tr>
       <tr>
-        <th>Payment with error on failure</th>
+        <th>Payment with error on failure (Avoid for Solidity)</th>
         <td>
           <pre>address.transfer()</pre>
         </td>
@@ -727,7 +838,7 @@ contract FeedConsumer {
         </td>
       </tr>
       <tr>
-        <th>Payment with false on failure</th>
+        <th>Payment with false on failure (Avoid for Solidity)</th>
         <td>
           <pre>address.send()</pre>
         </td>
@@ -762,7 +873,7 @@ log.Deposit(msg.sender, _id, msg.value)</pre>
         </td>
       </tr>
       <tr>
-        <th>Units and global constants</th>
+        <th>Units, global constants and type ranges</th>
         <td>
           <pre>1 ether
 1 finney
@@ -773,7 +884,12 @@ log.Deposit(msg.sender, _id, msg.value)</pre>
 1 hours
 1 days
 1 weeks
-1 years  // deprecated)</pre>
+1 years  // deprecated
+type(uint).min
+type(uint).max
+type(int8).min
+type(int8).max
+...</pre>
         </td>
         <td>
           <pre>ZERO_ADDRESS

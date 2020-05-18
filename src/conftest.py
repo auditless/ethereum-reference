@@ -111,7 +111,9 @@ def check_global_s(web3: Web3, snippet: str):
     check_contract_s(web3, code)
 
 
-def check_global_constructor_s(web3: Web3, global_snippet: str, constructor_snippet: str):
+def check_global_constructor_s(
+    web3: Web3, global_snippet: str, constructor_snippet: str
+):
     """Verify if piece of code compiles if placed in an
     empty solidity contract body"""
 

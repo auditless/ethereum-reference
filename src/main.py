@@ -24,10 +24,10 @@ import solc
 def version_s():
     """
     >>> str(sh.solc("--version"))[50:64]
-    'Version: 0.6.7'
+    'Version: 0.6.8'
     """
     return """$ solc --version
-Version: 0.6.7"""
+Version: 0.6.8"""
 
 
 @code
@@ -977,7 +977,7 @@ emit Deposit(msg.sender, _id, msg.value);"""
 log.Deposit(msg.sender, _id, msg.value)"""
                     )(*trip)
                 with tag("tr"):
-                    line("th", "Units and global constants")
+                    line("th", "Units, global constants and type ranges")
                     code(
                         lambda: """1 ether
 1 finney
@@ -988,7 +988,12 @@ log.Deposit(msg.sender, _id, msg.value)"""
 1 hours
 1 days
 1 weeks
-1 years  // deprecated)"""
+1 years  // deprecated
+type(uint).min
+type(uint).max
+type(int8).min
+type(int8).max
+..."""
                     )(*trip)
                     code(
                         lambda: """ZERO_ADDRESS
