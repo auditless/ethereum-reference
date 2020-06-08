@@ -24,10 +24,10 @@ import solc
 def version_s():
     """
     >>> str(sh.solc("--version"))[50:64]
-    'Version: 0.6.8'
+    'Version: 0.6.9'
     """
     return """$ solc --version
-Version: 0.6.8"""
+Version: 0.6.9"""
 
 
 @code
@@ -480,6 +480,23 @@ def define_f_s():
 
 
 @code
+def function_argument_storage_location_s():
+    r"""
+    >>> check_global_s(web3, "function first(uint[] calldata x) public pure returns (uint) { return x[0]; }")
+    >>> check_global_s(web3, "function first(uint[] memory x) public pure returns (uint) { return x[0]; }")
+    """
+    return """function first(uint[] calldata x) public pure returns (uint) {
+    // this function doesn't copy x to memory
+    return x[0];
+}
+
+function first(uint[] memory x) public pure returns (uint) {
+    // this function first copies x to memory
+    return x[0];
+}"""
+
+
+@code
 def define_f_v():
     r"""
     >>> check_global_v(web3, "@public\ndef add2(x: uint256, y: uint256) -> uint256:\n  return x + y")
@@ -868,6 +885,10 @@ def render() -> str:
                     line("th", "Define function")
                     define_f_s(*trip)
                     define_f_v(*trip)
+                with tag("tr"):
+                    line("th", "Function argument storage location")
+                    function_argument_storage_location_s(*trip)
+                    empty(*trip)
                 with tag("tr"):
                     line("th", "Invoke function")
                     code(lambda: "add2(x, y)")(*trip)

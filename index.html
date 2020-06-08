@@ -11,7 +11,7 @@ pipenv run python -m src.main
         <th>Version</th>
         <td>
           <pre>$ solc --version
-Version: 0.6.8</pre>
+Version: 0.6.9</pre>
         </td>
         <td>
           <pre>$ vyper --version
@@ -625,6 +625,23 @@ assert pair.y &gt; pair.x  # Accessing elements</pre>
           <pre>@public
 def add2(x: uint256, y: uint256) -&gt; uint256:
     return x + y</pre>
+        </td>
+      </tr>
+      <tr>
+        <th>Function argument storage location</th>
+        <td>
+          <pre>function first(uint[] calldata x) public pure returns (uint) {
+    // this function doesn't copy x to memory
+    return x[0];
+}
+
+function first(uint[] memory x) public pure returns (uint) {
+    // this function first copies x to memory
+    return x[0];
+}</pre>
+        </td>
+        <td>
+          <p></p>
         </td>
       </tr>
       <tr>
