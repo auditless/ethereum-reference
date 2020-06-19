@@ -23,11 +23,11 @@ import solc
 @code
 def version_s():
     """
-    >>> str(sh.solc("--version"))[50:64]
-    'Version: 0.6.9'
+    >>> str(sh.solc("--version"))[50:65]
+    'Version: 0.6.10'
     """
     return """$ solc --version
-Version: 0.6.9"""
+Version: 0.6.10"""
 
 
 @code
