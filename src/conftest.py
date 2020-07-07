@@ -82,7 +82,7 @@ def check_local_v(web3: Web3, snippet: str):
     lines = snippet.split("\n")
     indented_snippet = ("\n" + " " * 4).join(lines)
     code = f"""
-@public
+@external
 def __init__():
     {indented_snippet}
 """
@@ -137,7 +137,7 @@ def check_global_v(web3: Web3, snippet: str):
     code = f"""
 {snippet}
 
-@public
+@external
 def __init__():
     pass
 """
@@ -179,7 +179,7 @@ def check_v(web3: Web3, global_snippet: str, local_snippet: str):
     code = f"""
 {global_snippet}
 
-@public
+@external
 def __init__():
     {indented_snippet}
 """

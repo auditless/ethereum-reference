@@ -33,11 +33,11 @@ Version: 0.6.10"""
 @code
 def version_v():
     """
-    >>> str(sh.vyper("--version"))[:8]
-    '0.1.0b17'
+    >>> str(sh.vyper("--version"))[:5]
+    '0.2.2'
     """
     return """$ vyper --version
-0.1.0b17 (0.1.0 Beta 17)"""
+0.2.2"""
 
 
 @comment
@@ -133,9 +133,9 @@ def set_default_s():
 @code
 def set_default_v():
     r"""
-    >>> check_local_v(web3, "v: uint256= 1\nclear(v)")
+    >>> check_local_v(web3, "v: uint256= 1\nv = empty(uint256)")
     """
-    return "clear(v) # doesn't work with mappings"
+    return "v = empty(uint256)"
 
 
 @code
@@ -192,11 +192,11 @@ def interface_s():
 @code
 def interface_v():
     r"""
-    >>> check_compiles_v(web3, "contract HelloWorld:\n  def hello(): modifying\n\n@public\ndef test(addr: address):\n  HelloWorld(addr).hello()")
+    >>> check_compiles_v(web3, "interface HelloWorld:\n  def hello(): nonpayable\n\n@external\ndef test(addr: address):\n  HelloWorld(addr).hello()")
     """
-    return """contract HelloWorld:
-    def hello(): modifying
-    def world(uint256): modifyingo"""
+    return """interface HelloWorld:
+    def hello(): nonpayable
+    def world(uint256): nonpayable"""
 
 
 @code
@@ -235,17 +235,18 @@ def binary_hex_literals_s():
 def binary_hex_literals_v():
     r"""
     >>> check_local_v(web3, "a: address= 0x14d465376c051Cbcd80Aa2d35Fd5df9910f80543")
-    >>> check_local_v(web3, "b: bytes32= b'\x01\x02\x03\x04\x05\x06\x07\x08\x01\x02\x03\x04\x05\x06\x07\x08\x01\x02\x03\x04\x05\x06\x07\x08\x01\x02\x03\x04\x05\x06\x07\x08'")
-    >>> check_local_v(web3, "c: bytes32= 0x1234567812345678123456781234567812345678123456781234567812345678")
-    >>> check_local_v(web3, "b: bytes[1] = 0b00010001")
+    >>> check_local_v(web3, "b: Bytes[32]= b'\x01\x02\x03\x04\x05\x06\x07\x08\x01\x02\x03\x04\x05\x06\x07\x08\x01\x02\x03\x04\x05\x06\x07\x08\x01\x02\x03\x04\x05\x06\x07\x08'")
+    
+    # >>> check_local_v(web3, "c: Bytes[32]= 0x1234567812345678123456781234567812345678123456781234567812345678")
+    >>> check_local_v(web3, "b: Bytes[1] = 0b00010001")
     """
     return (
         "a: address= 0x14d465376c051Cbcd80Aa2d35Fd5df9910f80543\n"
-        + r"b: bytes32= b'\x01\x02\x03\x04\x05\x06... (32 bytes)"
+        + r"b: Bytes[32]= b'\x01\x02\x03\x04\x05\x06... (32 bytes)"
+        # + "\n"
+        # + "c: Bytes[32]= 0x010203040506... (32 bytes)"
         + "\n"
-        + "c: bytes32= 0x010203040506... (32 bytes)"
-        + "\n"
-        + "d: bytes[1] = 0b00010001"
+        + "d: Bytes[1] = 0b00010001"
     )
 
 
@@ -260,9 +261,9 @@ def string_type_s():
 @code
 def string_type_v():
     r"""
-    >>> check_local_v(web3, "s: string[100]= \"abc\"")
+    >>> check_local_v(web3, "s: String[100]= \"abc\"")
     """
-    return "string[N]  # N is a fixed number"
+    return "String[N]  # N is a fixed number"
 
 
 @code
@@ -273,9 +274,9 @@ def bytes_type_s():
 @code
 def bytes_type_v():
     r"""
-    >>> check_local_v(web3, "example_bytes: bytes[100] = b\"\x01\x02\x03\"")
+    >>> check_local_v(web3, "example_bytes: Bytes[100] = b\"\x01\x02\x03\"")
     """
-    return "bytes32\nbytes[N]  # N is a fixed number"
+    return "Bytes[N]  # N is a fixed number"
 
 
 @code
@@ -290,8 +291,8 @@ def string_literal_s():
 @code
 def string_literal_v():
     r"""
-    >>> check_local_v(web3, "s: string[100] = \"don't \\\"no\\\"\"")
-    >>> check_local_v(web3, "s: string[100] = 'don\"t \\'no\\''")
+    >>> check_local_v(web3, "s: String[100] = \"don't \\\"no\\\"\"")
+    >>> check_local_v(web3, "s: String[100] = 'don\"t \\'no\\''")
     """
     return "\"don't \\\"no\\\"\"\n'don\"t \\'no\\''"
 
@@ -307,7 +308,7 @@ def string_length_s():
 @code
 def string_length_v():
     r"""
-    >>> check_local_v(web3, "s: string[100] = \"abc\"\nassert len(s) == 3")
+    >>> check_local_v(web3, "s: String[100] = \"abc\"\nassert len(s) == 3")
     """
     return "len(s)"
 
@@ -335,9 +336,9 @@ def string_literal_escapes_s():
 @code
 def string_literal_escapes_v():
     r"""
-    >>> check_local_v(web3, "s: string[100]= \"\\\\ \\\'\\\"\\b\\f \\a\"")
-    >>> check_local_v(web3, "s: string[100]= \"\\n \\r \\t \\v \\x01 \\u0001\"")
-    >>> check_local_v(web3, "s: string[100]= \"\\u00010001\"")
+    >>> check_local_v(web3, "s: String[100]= \"\\\\ \\\'\\\"\\b\\f \\a\"")
+    >>> check_local_v(web3, "s: String[100]= \"\\n \\r \\t \\v \\x01 \\u0001\"")
+    >>> check_local_v(web3, "s: String[100]= \"\\u00010001\"")
     """
     return r"""\<newline> (escapes an actual newline)
 \\ (backslash)
@@ -372,7 +373,7 @@ def slice_s():
 @code
 def slice_v():
     r"""
-    >>> check_local_v(web3, "b: bytes[100] = b\"\x01\x02\x03\"\nassert len(slice(b, 0, 2)) == 2")
+    >>> check_local_v(web3, "b: Bytes[100] = b\"\x01\x02\x03\"\nassert len(slice(b, 0, 2)) == 2")
     """
     return "slice(x, _start, _len)"
 
@@ -456,9 +457,9 @@ assert pair.y > pair.x  # Accessing elements"""
 @code
 def mapping_delete_v():
     r"""
-    >>> check_v(web3, "m: map(uint256, uint256)", "self.m[2] = 2\nclear(self.m[2])")
+    >>> check_v(web3, "m: HashMap[uint256, uint256]", "self.m[2] = 2\nself.m[2] = empty(uint256)")
     """
-    return "clear(m[2])"
+    return "m[2] = empty(uint256)"
 
 
 @code
@@ -499,9 +500,9 @@ function first(uint[] memory x) public pure returns (uint) {
 @code
 def define_f_v():
     r"""
-    >>> check_global_v(web3, "@public\ndef add2(x: uint256, y: uint256) -> uint256:\n  return x + y")
+    >>> check_global_v(web3, "@external\ndef add2(x: uint256, y: uint256) -> uint256:\n  return x + y")
     """
-    return """@public
+    return """@external
 def add2(x: uint256, y: uint256) -> uint256:
     return x + y"""
 
@@ -993,9 +994,12 @@ def render() -> str:
 emit Deposit(msg.sender, _id, msg.value);"""
                     )(*trip)
                     code(
-                        lambda: """Deposit: event({_from: indexed(address), _id: indexed(bytes32), _value: uint256})
+                        lambda: """event Deposit:
+    _from: indexed(address)
+    _id: indexed(bytes32)
+    _value: uint256
 
-log.Deposit(msg.sender, _id, msg.value)"""
+log Deposit(msg.sender, _id, msg.value)"""
                     )(*trip)
                 with tag("tr"):
                     line("th", "Units, global constants and type ranges")
@@ -1029,18 +1033,7 @@ MIN_INT128
 MAX_DECIMAL
 MIN_DECIMAL
 MAX_UINT256
-ZERO_WEI
-
-time: timestamp
-time_diff: timedelta
-
-# define custom units
-units: {
-    cm: "centimeter",
-    km: "kilometer"
-}
-a: int128(cm)
-b: uint256(km)"""
+ZERO_WEI"""
                     )(*trip)
                 with tag("tr"):
                     line("th", "Block and transaction properties")

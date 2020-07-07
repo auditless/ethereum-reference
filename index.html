@@ -15,7 +15,7 @@ Version: 0.6.10</pre>
         </td>
         <td>
           <pre>$ vyper --version
-0.1.0b17 (0.1.0 Beta 17)</pre>
+0.2.2</pre>
         </td>
       </tr>
       <tr>
@@ -134,7 +134,7 @@ comment */</pre>
           <pre>delete v // doesn't work with mappings</pre>
         </td>
         <td>
-          <pre>clear(v) # doesn't work with mappings</pre>
+          <pre>v = empty(uint256)</pre>
         </td>
       </tr>
       <tr>
@@ -225,9 +225,9 @@ comment */</pre>
 }</pre>
         </td>
         <td>
-          <pre>contract HelloWorld:
-    def hello(): modifying
-    def world(uint256): modifyingo</pre>
+          <pre>interface HelloWorld:
+    def hello(): nonpayable
+    def world(uint256): nonpayable</pre>
         </td>
       </tr>
       <tr>
@@ -335,9 +335,8 @@ string memory s = hex"52"</pre>
         </td>
         <td>
           <pre>a: address= 0x14d465376c051Cbcd80Aa2d35Fd5df9910f80543
-b: bytes32= b'\x01\x02\x03\x04\x05\x06... (32 bytes)
-c: bytes32= 0x010203040506... (32 bytes)
-d: bytes[1] = 0b00010001</pre>
+b: Bytes[32]= b'\x01\x02\x03\x04\x05\x06... (32 bytes)
+d: Bytes[1] = 0b00010001</pre>
         </td>
       </tr>
       <tr>
@@ -354,7 +353,7 @@ d: bytes[1] = 0b00010001</pre>
           <pre>string</pre>
         </td>
         <td>
-          <pre>string[N]  # N is a fixed number</pre>
+          <pre>String[N]  # N is a fixed number</pre>
         </td>
       </tr>
       <tr>
@@ -365,8 +364,7 @@ bytes1, bytes2, ..., bytes32  // packed
 bytes[N]  // N is a fixed number, unpacked</pre>
         </td>
         <td>
-          <pre>bytes32
-bytes[N]  # N is a fixed number</pre>
+          <pre>Bytes[N]  # N is a fixed number</pre>
         </td>
       </tr>
       <tr>
@@ -594,7 +592,7 @@ assert pair.y &gt; pair.x  # Accessing elements</pre>
           <pre>m[2] = 0;</pre>
         </td>
         <td>
-          <pre>clear(m[2])</pre>
+          <pre>m[2] = empty(uint256)</pre>
         </td>
       </tr>
       <tr>
@@ -622,7 +620,7 @@ assert pair.y &gt; pair.x  # Accessing elements</pre>
 }</pre>
         </td>
         <td>
-          <pre>@public
+          <pre>@external
 def add2(x: uint256, y: uint256) -&gt; uint256:
     return x + y</pre>
         </td>
@@ -884,9 +882,12 @@ contract FeedConsumer {
 emit Deposit(msg.sender, _id, msg.value);</pre>
         </td>
         <td>
-          <pre>Deposit: event({_from: indexed(address), _id: indexed(bytes32), _value: uint256})
+          <pre>event Deposit:
+    _from: indexed(address)
+    _id: indexed(bytes32)
+    _value: uint256
 
-log.Deposit(msg.sender, _id, msg.value)</pre>
+log Deposit(msg.sender, _id, msg.value)</pre>
         </td>
       </tr>
       <tr>
@@ -921,18 +922,7 @@ MIN_INT128
 MAX_DECIMAL
 MIN_DECIMAL
 MAX_UINT256
-ZERO_WEI
-
-time: timestamp
-time_diff: timedelta
-
-# define custom units
-units: {
-    cm: "centimeter",
-    km: "kilometer"
-}
-a: int128(cm)
-b: uint256(km)</pre>
+ZERO_WEI</pre>
         </td>
       </tr>
       <tr>
