@@ -24,10 +24,10 @@ import solc
 def version_s():
     """
     >>> str(sh.solc("--version"))[50:65]
-    'Version: 0.6.10'
+    'Version: 0.6.11'
     """
     return """$ solc --version
-Version: 0.6.10"""
+Version: 0.6.11"""
 
 
 @code
@@ -949,13 +949,18 @@ def render() -> str:
                 with tag("tr"):
                     line("th", "Comments")
                     code(
-                        lambda: """NatSpec conventions:
+                        lambda: """NatSpec conventions for functions:
 
 /// @author Mary A. Botanist
 /// @notice Calculate tree age in years, rounded up, for live trees
 /// @dev The Alexandr N. Tetearing algorithm could increase precision
 /// @param rings The number of rings from dendrochronological sample
-/// @return age in years, rounded up for partial years"""
+/// @return age in years, rounded up for partial years
+
+Events:
+
+/// The address `participant` just registered for the gathering.
+event Registered(address participant);"""
                     )(*trip)
                     code(
                         lambda: """def foo():
@@ -1008,6 +1013,7 @@ log Deposit(msg.sender, _id, msg.value)"""
 1 finney
 1 szabo
 1 wei
+1 gwei
 1 seconds
 1 minutes
 1 hours

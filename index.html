@@ -11,7 +11,7 @@ pipenv run python -m src.main
         <th>Version</th>
         <td>
           <pre>$ solc --version
-Version: 0.6.10</pre>
+Version: 0.6.11</pre>
         </td>
         <td>
           <pre>$ vyper --version
@@ -823,13 +823,18 @@ contract FeedConsumer {
       <tr>
         <th>Comments</th>
         <td>
-          <pre>NatSpec conventions:
+          <pre>NatSpec conventions for functions:
 
 /// @author Mary A. Botanist
 /// @notice Calculate tree age in years, rounded up, for live trees
 /// @dev The Alexandr N. Tetearing algorithm could increase precision
 /// @param rings The number of rings from dendrochronological sample
-/// @return age in years, rounded up for partial years</pre>
+/// @return age in years, rounded up for partial years
+
+Events:
+
+/// The address `participant` just registered for the gathering.
+event Registered(address participant);</pre>
         </td>
         <td>
           <pre>def foo():
@@ -897,6 +902,7 @@ log Deposit(msg.sender, _id, msg.value)</pre>
 1 finney
 1 szabo
 1 wei
+1 gwei
 1 seconds
 1 minutes
 1 hours
