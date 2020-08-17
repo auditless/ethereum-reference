@@ -23,21 +23,21 @@ import solc
 @code
 def version_s():
     """
-    >>> str(sh.solc("--version"))[50:65]
-    'Version: 0.6.12'
+    >>> str(sh.solc("--version"))[50:64]
+    'Version: 0.7.0'
     """
     return """$ solc --version
-Version: 0.6.12"""
+Version: 0.7.0"""
 
 
 @code
 def version_v():
     """
     >>> str(sh.vyper("--version"))[:5]
-    '0.2.3'
+    '0.2.4'
     """
     return """$ vyper --version
-0.2.3"""
+0.2.4"""
 
 
 @comment
@@ -296,6 +296,12 @@ def string_literal_v():
     """
     return "\"don't \\\"no\\\"\"\n'don\"t \\'no\\''"
 
+@code
+def unicode_literal_s():
+    r"""
+    >>> check_local_s(web3, "string memory s = unicode\"🍠\";")
+    """
+    return "unicode\"🍠\""
 
 @code
 def string_length_s():
@@ -794,6 +800,10 @@ def render() -> str:
                     string_literal_s(*trip)
                     string_literal_v(*trip)
                 with tag("tr"):
+                    line("th", "Unicode literal")
+                    unicode_literal_s(*trip)
+                    empty(*trip)
+                with tag("tr"):
                     line("th", "String length")
                     string_length_s(*trip)
                     string_length_v(*trip)
@@ -987,7 +997,7 @@ Special inheritance syntax for contracts:
                     empty(*trip)
                 with tag("tr"):
                     line("th", "Payment with gas forwarding (WARNING)")
-                    code(lambda: "address.call.value().gas()()")(*trip)
+                    empty(*trip)
                     code(
                         lambda: "raw_call(address, data, outsize, gas, value, is_delegate_call)"
                     )(*trip)
@@ -1014,8 +1024,6 @@ log Deposit(msg.sender, _id, msg.value)"""
                     line("th", "Units, global constants and type ranges")
                     code(
                         lambda: """1 ether
-1 finney
-1 szabo
 1 wei
 1 gwei
 1 seconds
@@ -1055,7 +1063,7 @@ block.gaslimit
 block.number
 
 block.timestamp
-now  // alias for block.timestamp
+now  // alias for block.timestamp, deprecated
 gasleft()
 msg.data
 msg.gas

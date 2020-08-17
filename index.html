@@ -11,11 +11,11 @@ pipenv run python -m src.main
         <th>Version</th>
         <td>
           <pre>$ solc --version
-Version: 0.6.12</pre>
+Version: 0.7.0</pre>
         </td>
         <td>
           <pre>$ vyper --version
-0.2.3</pre>
+0.2.4</pre>
         </td>
       </tr>
       <tr>
@@ -376,6 +376,15 @@ bytes[N]  // N is a fixed number, unpacked</pre>
         <td>
           <pre>"don't \"no\""
 'don"t \'no\''</pre>
+        </td>
+      </tr>
+      <tr>
+        <th>Unicode literal</th>
+        <td>
+          <pre>unicode"🍠"</pre>
+        </td>
+        <td>
+          <p></p>
         </td>
       </tr>
       <tr>
@@ -873,7 +882,7 @@ Special inheritance syntax for contracts:
       <tr>
         <th>Payment with gas forwarding (WARNING)</th>
         <td>
-          <pre>address.call.value().gas()()</pre>
+          <p></p>
         </td>
         <td>
           <pre>raw_call(address, data, outsize, gas, value, is_delegate_call)</pre>
@@ -903,8 +912,6 @@ log Deposit(msg.sender, _id, msg.value)</pre>
         <th>Units, global constants and type ranges</th>
         <td>
           <pre>1 ether
-1 finney
-1 szabo
 1 wei
 1 gwei
 1 seconds
@@ -945,7 +952,7 @@ block.gaslimit
 block.number
 
 block.timestamp
-now  // alias for block.timestamp
+now  // alias for block.timestamp, deprecated
 gasleft()
 msg.data
 msg.gas
