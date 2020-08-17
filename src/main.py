@@ -24,20 +24,20 @@ import solc
 def version_s():
     """
     >>> str(sh.solc("--version"))[50:65]
-    'Version: 0.6.11'
+    'Version: 0.6.12'
     """
     return """$ solc --version
-Version: 0.6.11"""
+Version: 0.6.12"""
 
 
 @code
 def version_v():
     """
     >>> str(sh.vyper("--version"))[:5]
-    '0.2.2'
+    '0.2.3'
     """
     return """$ vyper --version
-0.2.2"""
+0.2.3"""
 
 
 @comment
@@ -960,7 +960,11 @@ def render() -> str:
 Events:
 
 /// The address `participant` just registered for the gathering.
-event Registered(address participant);"""
+event Registered(address participant);
+
+Special inheritance syntax for contracts:
+
+/// @inheritdoc OtherContract"""
                     )(*trip)
                     code(
                         lambda: """def foo():

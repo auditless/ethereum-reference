@@ -11,11 +11,11 @@ pipenv run python -m src.main
         <th>Version</th>
         <td>
           <pre>$ solc --version
-Version: 0.6.11</pre>
+Version: 0.6.12</pre>
         </td>
         <td>
           <pre>$ vyper --version
-0.2.2</pre>
+0.2.3</pre>
         </td>
       </tr>
       <tr>
@@ -834,7 +834,11 @@ contract FeedConsumer {
 Events:
 
 /// The address `participant` just registered for the gathering.
-event Registered(address participant);</pre>
+event Registered(address participant);
+
+Special inheritance syntax for contracts:
+
+/// @inheritdoc OtherContract</pre>
         </td>
         <td>
           <pre>def foo():

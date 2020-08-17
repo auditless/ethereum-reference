@@ -14,7 +14,7 @@ yattag = "*"
 sh = "*"
 pysolc = {editable = true,git = "https://github.com/Jonasmpi/py-solc.git"}
 web3 = {extras = ["tester"],version = "*"}
-vyper = "*"
+vyper = "==0.2.3"
 
 [requires]
 python_version = "3.7"
